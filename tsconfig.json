@@ -2,5 +2,14 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true
-  }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "types/**/*.d.ts"
+  ],
+  "exclude": [
+    "ui-backup/**/*",
+    "node_modules"
+  ]
 }

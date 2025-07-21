@@ -8,6 +8,7 @@ import NewWordScreen from './screens/NewWordScreen';
 import ReviewScreen from './screens/ReviewScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import LandingScreen from './screens/LandingScreen';
+import AnalyticsScreen from './screens/AnalyticsScreen';
 
 const Stack = createStackNavigator();
 
@@ -26,6 +27,7 @@ export default function App() {
         <Stack.Screen name="NewWord" component={NewWordScreen} />
         <Stack.Screen name="Review" component={ReviewScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="Analytics" component={AnalyticsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

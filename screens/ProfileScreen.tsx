@@ -315,68 +315,28 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           }}>
             SYSTEM CONFIGURATION
           </Text>
-          
-          <View style={{ gap: theme.spacing.md }}>
-            <TouchableOpacity
-              style={{
-                backgroundColor: theme.colors.background,
-                borderWidth: theme.borderWidth.normal,
-                borderColor: theme.colors.borderMuted,
-                padding: theme.spacing.lg,
-              }}
-              onPress={() => Alert.alert('Settings', 'Notification settings will be implemented here')}
-            >
-              <Text style={{
-                color: theme.colors.text,
-                fontFamily: fonts.monoBold,
-                fontSize: theme.fontSize.md,
-                textTransform: 'uppercase',
-                letterSpacing: theme.letterSpacing.tight,
-              }}>
-                NOTIFICATION PROTOCOLS
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={{
-                backgroundColor: theme.colors.background,
-                borderWidth: theme.borderWidth.normal,
-                borderColor: theme.colors.borderMuted,
-                padding: theme.spacing.lg,
-              }}
-              onPress={() => Alert.alert('Settings', 'Difficulty settings will be implemented here')}
-            >
-              <Text style={{
-                color: theme.colors.text,
-                fontFamily: fonts.monoBold,
-                fontSize: theme.fontSize.md,
-                textTransform: 'uppercase',
-                letterSpacing: theme.letterSpacing.tight,
-              }}>
-                DIFFICULTY PARAMETERS
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={{
-                backgroundColor: theme.colors.background,
-                borderWidth: theme.borderWidth.normal,
-                borderColor: theme.colors.borderMuted,
-                padding: theme.spacing.lg,
-              }}
-              onPress={() => Alert.alert('Settings', 'Export data will be implemented here')}
-            >
-              <Text style={{
-                color: theme.colors.text,
-                fontFamily: fonts.monoBold,
-                fontSize: theme.fontSize.md,
-                textTransform: 'uppercase',
-                letterSpacing: theme.letterSpacing.tight,
-              }}>
-                EXPORT DATA STREAM
-              </Text>
-            </TouchableOpacity>
-          </View>
+          {/* Analytics Link Button replaces the three settings boxes */}
+          <TouchableOpacity
+            style={{
+              backgroundColor: theme.colors.background,
+              borderWidth: theme.borderWidth.normal,
+              borderColor: theme.colors.borderMuted,
+              padding: theme.spacing.lg,
+              alignItems: 'center',
+              marginTop: theme.spacing.lg,
+            }}
+            onPress={() => navigation.navigate('Analytics')}
+          >
+            <Text style={{
+              color: theme.colors.text,
+              fontFamily: fonts.monoBold,
+              fontSize: theme.fontSize.md,
+              textTransform: 'uppercase',
+              letterSpacing: theme.letterSpacing.tight,
+            }}>
+              VIEW ANALYTICS
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* About Section */}

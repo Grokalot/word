@@ -236,6 +236,7 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 paddingVertical: theme.spacing.lg,
                 paddingHorizontal: theme.spacing.xl,
                 alignItems: 'center',
+                marginBottom: theme.spacing.lg,
               }}
               onPress={handleSubmit}
             >
@@ -247,6 +248,28 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 letterSpacing: theme.letterSpacing.normal,
               }}>
                 PROCESS DEFINITION
+              </Text>
+            </TouchableOpacity>
+            {/* Skip Button (before submission) */}
+            <TouchableOpacity
+              style={{
+                backgroundColor: theme.colors.surface,
+                borderWidth: theme.borderWidth.normal,
+                borderColor: theme.colors.border,
+                paddingVertical: theme.spacing.lg,
+                paddingHorizontal: theme.spacing.xl,
+                alignItems: 'center',
+              }}
+              onPress={handleNext}
+            >
+              <Text style={{
+                color: theme.colors.text,
+                fontFamily: fonts.monoBlack,
+                fontSize: theme.fontSize.xl,
+                textTransform: 'uppercase',
+                letterSpacing: theme.letterSpacing.normal,
+              }}>
+                SKIP
               </Text>
             </TouchableOpacity>
           </View>
@@ -383,28 +406,55 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 </View>
               </View>
             </View>
-            {/* Next Button */}
-            <TouchableOpacity
-              style={{
-                backgroundColor: theme.colors.primary,
-                borderWidth: theme.borderWidth.normal,
-                borderColor: theme.colors.border,
-                paddingVertical: theme.spacing.lg,
-                paddingHorizontal: theme.spacing.xl,
-                alignItems: 'center',
-              }}
-              onPress={handleNext}
-            >
-              <Text style={{
-                color: theme.colors.textInverted,
-                fontFamily: fonts.monoBlack,
-                fontSize: theme.fontSize.xl,
-                textTransform: 'uppercase',
-                letterSpacing: theme.letterSpacing.normal,
-              }}>
-                NEXT VOCABULARY UNIT
-              </Text>
-            </TouchableOpacity>
+            {/* Next and Skip Buttons */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: theme.spacing.lg }}>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: theme.colors.primary,
+                  borderWidth: theme.borderWidth.normal,
+                  borderColor: theme.colors.border,
+                  paddingVertical: theme.spacing.lg,
+                  paddingHorizontal: theme.spacing.xl,
+                  alignItems: 'center',
+                  flex: 1,
+                  marginRight: theme.spacing.lg / 2,
+                }}
+                onPress={handleNext}
+              >
+                <Text style={{
+                  color: theme.colors.textInverted,
+                  fontFamily: fonts.monoBlack,
+                  fontSize: theme.fontSize.xl,
+                  textTransform: 'uppercase',
+                  letterSpacing: theme.letterSpacing.normal,
+                }}>
+                  NEXT VOCABULARY UNIT
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: theme.colors.surface,
+                  borderWidth: theme.borderWidth.normal,
+                  borderColor: theme.colors.border,
+                  paddingVertical: theme.spacing.lg,
+                  paddingHorizontal: theme.spacing.xl,
+                  alignItems: 'center',
+                  flex: 1,
+                  marginLeft: theme.spacing.lg / 2,
+                }}
+                onPress={handleNext}
+              >
+                <Text style={{
+                  color: theme.colors.text,
+                  fontFamily: fonts.monoBlack,
+                  fontSize: theme.fontSize.xl,
+                  textTransform: 'uppercase',
+                  letterSpacing: theme.letterSpacing.normal,
+                }}>
+                  SKIP
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       </ScrollView>

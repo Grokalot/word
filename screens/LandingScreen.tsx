@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -11,28 +11,71 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../styles/theme';
 import { fonts } from '../styles/fonts';
+import { getPrioritizedWordList } from '../utils/wordlist';
+import { loadUserProgress, getTotalUptime, incrementTotalUptime } from '../utils/storage';
 
 const { width } = Dimensions.get('window');
 
 const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const fadeAnim = useState(new Animated.Value(0))[0];
+  const [metrics, setMetrics] = useState({
+    wordsCollected: 0,
+    wordsMastered: 0, // Placeholder, to be implemented
+    accuracyRate: 0,
+  });
+  const [totalUptime, setTotalUptime] = useState(0);
+  const sessionStartRef = useRef(Date.now());
 
   useEffect(() => {
-    // Update time every second
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
+    (async () => {
+      const wordList = getPrioritizedWordList();
+      const progress = await loadUserProgress();
+      const attempted = Object.values(progress);
+      const wordsCollected = wordList.length;
+      // Placeholder: words mastered (to be implemented)
+      const wordsMastered = 0;
+      // Calculate average accuracy
+      let accuracyRate = 0;
+      if (attempted.length > 0) {
+        const scores = attempted.map(w => w.lastScore || 0);
+        accuracyRate = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+      }
+      setMetrics({ wordsCollected, wordsMastered, accuracyRate });
+      // Load total uptime
+      const uptime = await getTotalUptime();
+      setTotalUptime(uptime);
+      sessionStartRef.current = Date.now();
+    })();
+    // On unmount, update total uptime
+    return () => {
+      const sessionSeconds = Math.floor((Date.now() - sessionStartRef.current) / 1000);
+      if (sessionSeconds > 0) incrementTotalUptime(sessionSeconds);
+    };
+  }, []);
 
-    // Fade in animation
+  useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
-      duration: 1000,
+      duration: 500,
       useNativeDriver: true,
     }).start();
-
-    return () => clearInterval(timer);
   }, []);
+
+  // Update uptime every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTotalUptime(uptime => uptime + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  function formatUptime(seconds: number) {
+    const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  }
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', {
@@ -87,7 +130,7 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           alignItems: 'center',
         }}>
           <Text style={{
-            color: theme.colors.textMuted,
+            color: theme.colors.success, // green
             fontFamily: fonts.mono,
             fontSize: theme.fontSize.sm,
             textTransform: 'uppercase',
@@ -95,7 +138,6 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           }}>
             STATUS: ACTIVE
           </Text>
-          
           <Text style={{
             color: theme.colors.textMuted,
             fontFamily: fonts.mono,
@@ -103,7 +145,7 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             textTransform: 'uppercase',
             letterSpacing: theme.letterSpacing.tight,
           }}>
-            UPTIME: 127:45:32
+            UPTIME: {formatUptime(totalUptime)}
           </Text>
         </View>
       </View>
@@ -142,32 +184,23 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         }} />
       </TouchableOpacity>
 
-      <ScrollView style={{ flex: 1, paddingHorizontal: theme.spacing.xxxl }}>
+      <ScrollView
+        style={{ flex: 1, paddingHorizontal: theme.spacing.xxxl }}
+        contentContainerStyle={{ paddingBottom: theme.spacing.xxxxl }}
+      >
         <Animated.View style={{ opacity: fadeAnim }}>
           {/* Header Section */}
           <View style={{
-            paddingVertical: theme.spacing.xxxxl,
+            paddingVertical: theme.spacing.lg, // smaller
             borderBottomWidth: theme.borderWidth.thick,
             borderBottomColor: theme.colors.borderMuted,
-            marginBottom: theme.spacing.xxxl,
+            marginBottom: theme.spacing.lg, // smaller
           }}>
-            {/* Logo */}
-            <Text style={{
-              color: theme.colors.text,
-              fontFamily: fonts.monoBlack,
-              fontSize: theme.fontSize.xxxxxl,
-              marginBottom: theme.spacing.lg,
-              letterSpacing: theme.letterSpacing.extraWide,
-              textTransform: 'uppercase',
-              lineHeight: 0.9,
-            }}>
-              WORD!
-            </Text>
-            
+            {/* Logo removed */}
             <Text style={{
               color: theme.colors.textMuted,
               fontFamily: fonts.monoBold,
-              fontSize: theme.fontSize.xl,
+              fontSize: theme.fontSize.md, // smaller
               textTransform: 'uppercase',
               letterSpacing: theme.letterSpacing.wide,
             }}>
@@ -180,13 +213,13 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             backgroundColor: theme.colors.surface,
             borderWidth: theme.borderWidth.thick,
             borderColor: theme.colors.border,
-            padding: theme.spacing.xl,
-            marginBottom: theme.spacing.xxxl,
+            padding: theme.spacing.lg, // smaller
+            marginBottom: theme.spacing.lg, // smaller
           }}>
             <Text style={{
               color: theme.colors.textMuted,
               fontFamily: fonts.mono,
-              fontSize: theme.fontSize.md,
+              fontSize: theme.fontSize.sm, // smaller
               marginBottom: theme.spacing.xs,
             }}>
               {'>'} INITIALIZING VOCABULARY PROCESSOR...
@@ -194,7 +227,7 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             <Text style={{
               color: theme.colors.textMuted,
               fontFamily: fonts.mono,
-              fontSize: theme.fontSize.md,
+              fontSize: theme.fontSize.sm, // smaller
               marginBottom: theme.spacing.xs,
             }}>
               {'>'} LOADING WORD DATABASES...
@@ -202,7 +235,7 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             <Text style={{
               color: theme.colors.textMuted,
               fontFamily: fonts.mono,
-              fontSize: theme.fontSize.md,
+              fontSize: theme.fontSize.sm, // smaller
               marginBottom: theme.spacing.xs,
             }}>
               {'>'} NEURAL NETWORKS READY
@@ -210,7 +243,7 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             <Text style={{
               color: theme.colors.text,
               fontFamily: fonts.mono,
-              fontSize: theme.fontSize.md,
+              fontSize: theme.fontSize.sm, // smaller
             }}>
               {'>'} AWAITING INPUT_
             </Text>
@@ -218,28 +251,27 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
           {/* Mode Selection Section */}
           <View style={{
-            marginBottom: theme.spacing.xxxxl,
+            marginBottom: theme.spacing.lg, // smaller
           }}>
             <Text style={{
               color: theme.colors.text,
               fontFamily: fonts.monoBlack,
-              fontSize: theme.fontSize.xl,
+              fontSize: theme.fontSize.lg, // smaller
               textTransform: 'uppercase',
               letterSpacing: theme.letterSpacing.normal,
-              marginBottom: theme.spacing.xl,
+              marginBottom: theme.spacing.md, // smaller
               textAlign: 'center',
             }}>
               SELECT OPERATION MODE
             </Text>
-            
-            <View style={{ gap: theme.spacing.xl }}>
+            <View style={{ gap: theme.spacing.md }}>
               {/* New Acquisition Mode */}
               <TouchableOpacity
                 style={{
                   backgroundColor: theme.colors.surface,
                   borderWidth: theme.borderWidth.thick,
                   borderColor: theme.colors.border,
-                  padding: theme.spacing.xxxl,
+                  padding: theme.spacing.lg, // smaller
                 }}
                 onPress={() => navigation.navigate('NewWord')}
               >
@@ -247,11 +279,11 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginBottom: theme.spacing.lg,
+                  marginBottom: theme.spacing.sm, // smaller
                 }}>
                   <View style={{
-                    width: 40,
-                    height: 40,
+                    width: 28, // smaller
+                    height: 28, // smaller
                     backgroundColor: theme.colors.primary,
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -259,7 +291,7 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     <Text style={{
                       color: theme.colors.textInverted,
                       fontFamily: fonts.monoBlack,
-                      fontSize: theme.fontSize.xxxl,
+                      fontSize: theme.fontSize.lg, // smaller
                     }}>
                       01
                     </Text>
@@ -267,7 +299,7 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   <Text style={{
                     color: theme.colors.text,
                     fontFamily: fonts.monoBlack,
-                    fontSize: theme.fontSize.xxxl,
+                    fontSize: theme.fontSize.lg, // smaller
                   }}>
                     ▶
                   </Text>
@@ -275,18 +307,18 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <Text style={{
                   color: theme.colors.text,
                   fontFamily: fonts.monoBlack,
-                  fontSize: theme.fontSize.xl,
+                  fontSize: theme.fontSize.md, // smaller
                   textTransform: 'uppercase',
                   letterSpacing: theme.letterSpacing.normal,
-                  marginBottom: theme.spacing.md,
+                  marginBottom: theme.spacing.xs, // smaller
                 }}>
                   NEW ACQUISITION
                 </Text>
                 <Text style={{
                   color: theme.colors.textMuted,
                   fontFamily: fonts.monoBold,
-                  fontSize: theme.fontSize.md,
-                  lineHeight: 20,
+                  fontSize: theme.fontSize.sm, // smaller
+                  lineHeight: 18,
                   textTransform: 'uppercase',
                   letterSpacing: theme.letterSpacing.tight,
                 }}>
@@ -300,7 +332,7 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   backgroundColor: theme.colors.surface,
                   borderWidth: theme.borderWidth.thick,
                   borderColor: theme.colors.border,
-                  padding: theme.spacing.xxxl,
+                  padding: theme.spacing.lg, // smaller
                 }}
                 onPress={() => navigation.navigate('Review')}
               >
@@ -308,11 +340,11 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginBottom: theme.spacing.lg,
+                  marginBottom: theme.spacing.sm, // smaller
                 }}>
                   <View style={{
-                    width: 40,
-                    height: 40,
+                    width: 28, // smaller
+                    height: 28, // smaller
                     backgroundColor: theme.colors.primary,
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -320,7 +352,7 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     <Text style={{
                       color: theme.colors.textInverted,
                       fontFamily: fonts.monoBlack,
-                      fontSize: theme.fontSize.xxxl,
+                      fontSize: theme.fontSize.lg, // smaller
                     }}>
                       02
                     </Text>
@@ -328,7 +360,7 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   <Text style={{
                     color: theme.colors.text,
                     fontFamily: fonts.monoBlack,
-                    fontSize: theme.fontSize.xxxl,
+                    fontSize: theme.fontSize.lg, // smaller
                   }}>
                     ↻
                   </Text>
@@ -336,22 +368,22 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <Text style={{
                   color: theme.colors.text,
                   fontFamily: fonts.monoBlack,
-                  fontSize: theme.fontSize.xl,
+                  fontSize: theme.fontSize.md, // smaller
                   textTransform: 'uppercase',
                   letterSpacing: theme.letterSpacing.normal,
-                  marginBottom: theme.spacing.md,
+                  marginBottom: theme.spacing.xs, // smaller
                 }}>
                   RETENTION DRILL
                 </Text>
                 <Text style={{
                   color: theme.colors.textMuted,
                   fontFamily: fonts.monoBold,
-                  fontSize: theme.fontSize.md,
-                  lineHeight: 20,
+                  fontSize: theme.fontSize.sm, // smaller
+                  lineHeight: 18,
                   textTransform: 'uppercase',
                   letterSpacing: theme.letterSpacing.tight,
                 }}>
-                  REINFORCE EXISTING PATTERNS THROUGH SYSTEMATIC REPETITION
+                  TEST RETENTION OF PREVIOUSLY PROCESSED VOCABULARY
                 </Text>
               </TouchableOpacity>
             </View>
@@ -362,34 +394,38 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             backgroundColor: theme.colors.surface,
             borderWidth: theme.borderWidth.thick,
             borderColor: theme.colors.border,
-            marginBottom: theme.spacing.xxxl,
+            marginBottom: theme.spacing.lg, // smaller
             overflow: 'hidden',
           }}>
             <View style={{
               backgroundColor: theme.colors.primary,
-              paddingVertical: theme.spacing.lg,
-              paddingHorizontal: theme.spacing.xxxl,
+              paddingVertical: theme.spacing.sm, // smaller
+              paddingHorizontal: theme.spacing.lg, // smaller
             }}>
               <Text style={{
                 color: theme.colors.textInverted,
                 fontFamily: fonts.monoBlack,
-                fontSize: theme.fontSize.lg,
+                fontSize: theme.fontSize.md, // smaller
                 textTransform: 'uppercase',
                 letterSpacing: theme.letterSpacing.normal,
               }}>
                 SYSTEM METRICS
               </Text>
             </View>
-            
             <View style={{
               flexDirection: width > 768 ? 'row' : 'column',
-              height: width > 768 ? 120 : 'auto',
+              height: width > 768 ? 80 : 'auto', // smaller
             }}>
-              {[
-                { number: '4,096', label: 'WORDS PROCESSED' },
-                { number: '32', label: 'ACTIVE DATASETS' },
-                { number: '98.7%', label: 'ACCURACY RATE' },
-              ].map((stat, index) => (
+              {[{
+                number: metrics.wordsCollected,
+                label: 'WORDS COLLECTED',
+              }, {
+                number: metrics.wordsMastered,
+                label: 'WORDS MASTERED',
+              }, {
+                number: metrics.accuracyRate + '%',
+                label: 'ACCURACY RATE',
+              }].map((stat, index) => (
                 <View
                   key={stat.label}
                   style={{
@@ -400,14 +436,14 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     borderRightColor: theme.colors.borderMuted,
                     borderBottomWidth: width <= 768 && index < 2 ? theme.borderWidth.normal : 0,
                     borderBottomColor: theme.colors.borderMuted,
-                    padding: theme.spacing.lg,
+                    padding: theme.spacing.md, // smaller
                   }}
                 >
                   <Text style={{
                     color: theme.colors.text,
                     fontFamily: fonts.monoBlack,
-                    fontSize: theme.fontSize.xxxxl,
-                    marginBottom: theme.spacing.sm,
+                    fontSize: theme.fontSize.xl, // smaller
+                    marginBottom: theme.spacing.xs,
                   }}>
                     {stat.number}
                   </Text>

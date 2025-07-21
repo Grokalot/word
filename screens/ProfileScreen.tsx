@@ -100,13 +100,13 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         <View style={{ width: 100 }} />
       </View>
 
-      <ScrollView style={{ flex: 1, paddingHorizontal: theme.spacing.xxxl }}>
+      <ScrollView style={{ flex: 1, paddingHorizontal: theme.spacing.lg }}>
         {/* Header Section */}
         <View style={{
-          paddingVertical: theme.spacing.xxxxl,
+          paddingVertical: theme.spacing.lg,
           borderBottomWidth: theme.borderWidth.thick,
           borderBottomColor: theme.colors.borderMuted,
-          marginBottom: theme.spacing.xxxl,
+          marginBottom: theme.spacing.lg,
         }}>
           <Text style={{
             color: theme.colors.textMuted,
@@ -114,15 +114,14 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             fontSize: theme.fontSize.sm,
             textTransform: 'uppercase',
             letterSpacing: theme.letterSpacing.tight,
-            marginBottom: theme.spacing.lg,
+            marginBottom: theme.spacing.sm,
           }}>
             VOCABULARY.PROCESSING.SYSTEM.V3 - USER CONFIGURATION
           </Text>
-          
           <Text style={{
             color: theme.colors.text,
             fontFamily: fonts.monoBlack,
-            fontSize: theme.fontSize.xxxxl,
+            fontSize: theme.fontSize.xxl,
             textTransform: 'uppercase',
             letterSpacing: theme.letterSpacing.wide,
             textAlign: 'center',
@@ -130,14 +129,14 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             PROFILE
           </Text>
         </View>
-
+        <View style={{ gap: theme.spacing.md }}>
         {!isLoggedIn ? (
           <View style={{
             backgroundColor: theme.colors.surface,
             borderWidth: theme.borderWidth.thick,
             borderColor: theme.colors.border,
-            padding: theme.spacing.xxxl,
-            marginBottom: theme.spacing.xxxl,
+            padding: theme.spacing.lg,
+            marginBottom: theme.spacing.lg,
           }}>
             <Text style={{
               color: theme.colors.text,
@@ -145,7 +144,7 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               fontSize: theme.fontSize.lg,
               textTransform: 'uppercase',
               letterSpacing: theme.letterSpacing.normal,
-              marginBottom: theme.spacing.lg,
+              marginBottom: theme.spacing.md,
             }}>
               AUTHENTICATION REQUIRED
             </Text>
@@ -154,7 +153,7 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               fontFamily: fonts.mono,
               fontSize: theme.fontSize.md,
               lineHeight: 20,
-              marginBottom: theme.spacing.xl,
+              marginBottom: theme.spacing.lg,
             }}>
               Sign in to sync your progress and access all features
             </Text>
@@ -163,8 +162,8 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 backgroundColor: theme.colors.primary,
                 borderWidth: theme.borderWidth.thick,
                 borderColor: theme.colors.border,
-                paddingVertical: theme.spacing.xl,
-                paddingHorizontal: theme.spacing.xxxl,
+                paddingVertical: theme.spacing.lg,
+                paddingHorizontal: theme.spacing.xl,
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -188,8 +187,8 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             backgroundColor: theme.colors.surface,
             borderWidth: theme.borderWidth.thick,
             borderColor: theme.colors.border,
-            padding: theme.spacing.xxxl,
-            marginBottom: theme.spacing.xxxl,
+            padding: theme.spacing.lg,
+            marginBottom: theme.spacing.lg,
           }}>
             <Text style={{
               color: theme.colors.text,
@@ -197,11 +196,10 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               fontSize: theme.fontSize.lg,
               textTransform: 'uppercase',
               letterSpacing: theme.letterSpacing.normal,
-              marginBottom: theme.spacing.lg,
+              marginBottom: theme.spacing.md,
             }}>
               USER STATISTICS
             </Text>
-            
             <View style={{ gap: theme.spacing.md }}>
               <View style={{
                 backgroundColor: theme.colors.background,
@@ -219,7 +217,6 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   WORDS PROCESSED: {userStats.wordsLearned}
                 </Text>
               </View>
-              
               <View style={{
                 backgroundColor: theme.colors.background,
                 borderWidth: theme.borderWidth.normal,
@@ -236,7 +233,6 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   CURRENT STREAK: {userStats.currentStreak} DAYS
                 </Text>
               </View>
-              
               <View style={{
                 backgroundColor: theme.colors.background,
                 borderWidth: theme.borderWidth.normal,
@@ -253,7 +249,6 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   LONGEST STREAK: {userStats.longestStreak} DAYS
                 </Text>
               </View>
-              
               <View style={{
                 backgroundColor: theme.colors.background,
                 borderWidth: theme.borderWidth.normal,
@@ -271,16 +266,15 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 </Text>
               </View>
             </View>
-            
             <TouchableOpacity
               style={{
                 backgroundColor: theme.colors.error,
                 borderWidth: theme.borderWidth.thick,
                 borderColor: theme.colors.border,
-                paddingVertical: theme.spacing.xl,
-                paddingHorizontal: theme.spacing.xxxl,
+                paddingVertical: theme.spacing.lg,
+                paddingHorizontal: theme.spacing.xl,
                 alignItems: 'center',
-                marginTop: theme.spacing.xl,
+                marginTop: theme.spacing.lg,
               }}
               onPress={handleSignOut}
             >
@@ -296,14 +290,15 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         )}
+        </View>
 
         {/* Settings Section */}
         <View style={{
           backgroundColor: theme.colors.surface,
           borderWidth: theme.borderWidth.thick,
           borderColor: theme.colors.border,
-          padding: theme.spacing.xxxl,
-          marginBottom: theme.spacing.xxxl,
+          padding: theme.spacing.lg,
+          marginBottom: theme.spacing.lg,
         }}>
           <Text style={{
             color: theme.colors.text,
@@ -311,7 +306,7 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             fontSize: theme.fontSize.lg,
             textTransform: 'uppercase',
             letterSpacing: theme.letterSpacing.normal,
-            marginBottom: theme.spacing.lg,
+            marginBottom: theme.spacing.md,
           }}>
             SYSTEM CONFIGURATION
           </Text>
@@ -323,7 +318,7 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               borderColor: theme.colors.borderMuted,
               padding: theme.spacing.lg,
               alignItems: 'center',
-              marginTop: theme.spacing.lg,
+              marginTop: theme.spacing.md,
             }}
             onPress={() => navigation.navigate('Analytics')}
           >
@@ -344,8 +339,8 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           backgroundColor: theme.colors.surface,
           borderWidth: theme.borderWidth.thick,
           borderColor: theme.colors.border,
-          padding: theme.spacing.xxxl,
-          marginBottom: theme.spacing.xxxl,
+          padding: theme.spacing.lg,
+          marginBottom: theme.spacing.lg,
         }}>
           <Text style={{
             color: theme.colors.text,
@@ -353,7 +348,7 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             fontSize: theme.fontSize.lg,
             textTransform: 'uppercase',
             letterSpacing: theme.letterSpacing.normal,
-            marginBottom: theme.spacing.lg,
+            marginBottom: theme.spacing.md,
           }}>
             SYSTEM INFORMATION
           </Text>

@@ -53,6 +53,7 @@ const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         borderBottomColor: theme.colors.border,
         height: 60,
         paddingHorizontal: 0,
+        marginTop: 50,
       }}>
         {/* Back Button */}
         <TouchableOpacity

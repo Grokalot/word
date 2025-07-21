@@ -59,104 +59,88 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         zIndex: -1,
       }} />
 
-      {/* Navigation Bar */}
+      {/* System Info Bar */}
       <View style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
         backgroundColor: theme.colors.surface,
-        borderBottomWidth: theme.borderWidth.thick,
-        borderBottomColor: theme.colors.border,
-        height: 60,
-        paddingHorizontal: 0,
+        height: 80,
+        marginTop: 50,
+        marginRight: 60, // Reserve space for profile button
+        paddingHorizontal: theme.spacing.lg,
+        justifyContent: 'center',
       }}>
-        {/* Brand */}
+        {/* Top Row - Long Text */}
+        <Text style={{
+          color: theme.colors.textMuted,
+          fontFamily: fonts.mono,
+          fontSize: theme.fontSize.sm,
+          textTransform: 'uppercase',
+          letterSpacing: theme.letterSpacing.tight,
+          marginBottom: theme.spacing.sm,
+        }}>
+          VOCABULARY.PROCESSING.SYSTEM.V3
+        </Text>
+        
+        {/* Bottom Row - Status and Uptime */}
         <View style={{
           flexDirection: 'row',
+          justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: theme.colors.primary,
-          height: '100%',
-          paddingHorizontal: theme.spacing.xl,
         }}>
-          <View style={{
-            width: 24,
-            height: 24,
-            backgroundColor: theme.colors.surface,
-            marginRight: theme.spacing.md,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-            <Text style={{
-              color: theme.colors.primary,
-              fontFamily: fonts.monoBlack,
-              fontSize: theme.fontSize.sm,
-            }}>
-              W
-            </Text>
-          </View>
           <Text style={{
-            color: theme.colors.textInverted,
-            fontFamily: fonts.monoBlack,
-            fontSize: theme.fontSize.lg,
-            letterSpacing: theme.letterSpacing.normal,
+            color: theme.colors.textMuted,
+            fontFamily: fonts.mono,
+            fontSize: theme.fontSize.sm,
+            textTransform: 'uppercase',
+            letterSpacing: theme.letterSpacing.tight,
           }}>
-            WORD!
+            STATUS: ACTIVE
+          </Text>
+          
+          <Text style={{
+            color: theme.colors.textMuted,
+            fontFamily: fonts.mono,
+            fontSize: theme.fontSize.sm,
+            textTransform: 'uppercase',
+            letterSpacing: theme.letterSpacing.tight,
+          }}>
+            UPTIME: 127:45:32
           </Text>
         </View>
-
-        {/* Navigation Menu */}
-        <View style={{ flexDirection: 'row', height: '100%' }}>
-          {['TERMINAL', 'ARCHIVE', 'METRICS', 'CONFIG'].map((item, index) => (
-            <TouchableOpacity
-              key={item}
-              style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                paddingHorizontal: theme.spacing.xl,
-                borderRightWidth: theme.borderWidth.normal,
-                borderRightColor: theme.colors.borderMuted,
-                height: '100%',
-                backgroundColor: theme.colors.surface,
-              }}
-            >
-              <Text style={{
-                color: theme.colors.text,
-                fontFamily: fonts.monoBold,
-                fontSize: theme.fontSize.md,
-                textTransform: 'uppercase',
-                letterSpacing: theme.letterSpacing.tight,
-              }}>
-                {item}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Profile Section */}
-        <View style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          height: '100%',
-          backgroundColor: theme.colors.primary,
-          paddingHorizontal: theme.spacing.xl,
-        }}>
-          <View style={{
-            width: 32,
-            height: 32,
-            backgroundColor: theme.colors.surface,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-            <Text style={{
-              color: theme.colors.primary,
-              fontFamily: fonts.monoBlack,
-              fontSize: theme.fontSize.md,
-            }}>
-              ●
-            </Text>
-          </View>
-        </View>
       </View>
+
+      {/* Full Width Border */}
+      <View style={{
+        position: 'absolute',
+        top: 130, // 50 + 80 to align with bottom of system info bar
+        left: 0,
+        right: 0,
+        height: theme.borderWidth.thick,
+        backgroundColor: theme.colors.border,
+      }} />
+
+      {/* Small Profile Button */}
+      <TouchableOpacity
+        style={{
+          position: 'absolute',
+          top: 50,
+          right: theme.spacing.lg,
+          width: 40,
+          height: 40,
+          backgroundColor: theme.colors.surface,
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderWidth: 1,
+          borderColor: theme.colors.border,
+        }}
+        onPress={() => navigation.navigate('Profile')}
+      >
+        <View style={{
+          width: 16,
+          height: 16,
+          backgroundColor: theme.colors.primary,
+          borderRadius: 8,
+        }} />
+      </TouchableOpacity>
 
       <ScrollView style={{ flex: 1, paddingHorizontal: theme.spacing.xxxl }}>
         <Animated.View style={{ opacity: fadeAnim }}>
@@ -167,41 +151,6 @@ const LandingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             borderBottomColor: theme.colors.borderMuted,
             marginBottom: theme.spacing.xxxl,
           }}>
-            {/* System Info */}
-            <View style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              marginBottom: theme.spacing.xxxl,
-            }}>
-              <Text style={{
-                color: theme.colors.textMuted,
-                fontFamily: fonts.mono,
-                fontSize: theme.fontSize.sm,
-                textTransform: 'uppercase',
-                letterSpacing: theme.letterSpacing.tight,
-              }}>
-                VOCABULARY.PROCESSING.SYSTEM.V3
-              </Text>
-              <Text style={{
-                color: theme.colors.textMuted,
-                fontFamily: fonts.mono,
-                fontSize: theme.fontSize.sm,
-                textTransform: 'uppercase',
-                letterSpacing: theme.letterSpacing.tight,
-              }}>
-                STATUS: ACTIVE
-              </Text>
-              <Text style={{
-                color: theme.colors.textMuted,
-                fontFamily: fonts.mono,
-                fontSize: theme.fontSize.sm,
-                textTransform: 'uppercase',
-                letterSpacing: theme.letterSpacing.tight,
-              }}>
-                UPTIME: 127:45:32
-              </Text>
-            </View>
-
             {/* Logo */}
             <Text style={{
               color: theme.colors.text,

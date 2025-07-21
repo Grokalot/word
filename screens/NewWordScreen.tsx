@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,61 +13,71 @@ import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../styles/theme';
 import { fonts } from '../styles/fonts';
 import { scoreDefinition } from '../api/openai';
+import { getPrioritizedWordList, WordEntry } from '../utils/wordlist';
 
 const { width } = Dimensions.get('window');
 
 const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-  const [currentWord, setCurrentWord] = useState('serendipity');
+  const [wordList, setWordList] = useState<WordEntry[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentWord, setCurrentWord] = useState('');
   const [userDefinition, setUserDefinition] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [feedback, setFeedback] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [aiDefinition, setAiDefinition] = useState<string | undefined>(undefined);
+
+  // Load and clean word list on mount
+  useEffect(() => {
+    (async () => {
+      const list = await getPrioritizedWordList();
+      setWordList(list);
+      setCurrentIndex(0);
+      setCurrentWord(list[0]?.word || '');
+    })();
+  }, []);
 
   const handleSubmit = async () => {
     if (!userDefinition.trim()) {
       Alert.alert('Error', 'Please enter your definition');
       return;
     }
-    
     setIsSubmitted(true);
     setIsLoading(true);
-    
     try {
-      const realDefinition = getRealDefinition(currentWord);
-      
+      const realDefinition = currentWord;
       const result = await scoreDefinition(userDefinition, currentWord, realDefinition);
       setScore(result.score);
       setFeedback(result.explanation);
+      setAiDefinition(result.ai_definition);
     } catch (error) {
       console.error('Scoring error:', error);
       setScore(0);
       setFeedback('Error scoring your definition. Please try again.');
+      setAiDefinition(undefined);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleNext = () => {
-    setCurrentWord('ephemeral');
-    setUserDefinition('');
-    setIsSubmitted(false);
-    setScore(null);
-    setFeedback('');
-    setIsLoading(false);
+    const nextIndex = currentIndex + 1;
+    if (nextIndex < wordList.length) {
+      setCurrentIndex(nextIndex);
+      setCurrentWord(wordList[nextIndex].word);
+      setUserDefinition('');
+      setIsSubmitted(false);
+      setScore(null);
+      setFeedback('');
+      setIsLoading(false);
+      setAiDefinition(undefined);
+    } else {
+      Alert.alert('End of list', 'You have reached the end of your word list!');
+    }
   };
 
-  // Real definitions for the words
-  const getRealDefinition = (word: string): string => {
-    const definitions: { [key: string]: string } = {
-      'serendipity': 'The occurrence and development of events by chance in a happy or beneficial way',
-      'ephemeral': 'Lasting for a very short time; transitory',
-      'ubiquitous': 'Present, appearing, or found everywhere',
-      'enigmatic': 'Difficult to interpret or understand; mysterious',
-      'resilient': 'Able to withstand or recover quickly from difficult conditions',
-    };
-    return definitions[word] || 'Definition not available';
-  };
+  // Remove getRealDefinition and all hardcoded word/definition logic
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
@@ -130,13 +140,18 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         <View style={{ width: 100 }} />
       </View>
 
-      <ScrollView style={{ flex: 1, paddingHorizontal: theme.spacing.xxxl }}>
+      <ScrollView 
+        style={{ flex: 1, paddingHorizontal: theme.spacing.lg }}
+        showsVerticalScrollIndicator={true}
+        contentContainerStyle={{ paddingBottom: 50 }}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Header Section */}
         <View style={{
-          paddingVertical: theme.spacing.xxxxl,
-          borderBottomWidth: theme.borderWidth.thick,
+          paddingVertical: theme.spacing.xxxl,
+          borderBottomWidth: theme.borderWidth.normal,
           borderBottomColor: theme.colors.borderMuted,
-          marginBottom: theme.spacing.xxxl,
+          marginBottom: theme.spacing.xl,
         }}>
           <Text style={{
             color: theme.colors.textMuted,
@@ -148,7 +163,6 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           }}>
             VOCABULARY.PROCESSING.SYSTEM.V3 - NEW ACQUISITION MODE
           </Text>
-          
           <Text style={{
             color: theme.colors.text,
             fontFamily: fonts.monoBlack,
@@ -166,10 +180,10 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             {/* Input Section */}
             <View style={{
               backgroundColor: theme.colors.surface,
-              borderWidth: theme.borderWidth.thick,
+              borderWidth: theme.borderWidth.normal,
               borderColor: theme.colors.border,
-              padding: theme.spacing.xxxl,
-              marginBottom: theme.spacing.xxxl,
+              padding: theme.spacing.xl,
+              marginBottom: theme.spacing.xl,
             }}>
               <Text style={{
                 color: theme.colors.text,
@@ -181,16 +195,15 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               }}>
                 ENTER DEFINITION:
               </Text>
-              
               <TextInput
                 style={{
                   backgroundColor: theme.colors.background,
-                  borderWidth: theme.borderWidth.thick,
+                  borderWidth: theme.borderWidth.normal,
                   borderColor: theme.colors.border,
                   color: theme.colors.text,
                   fontFamily: fonts.mono,
                   fontSize: theme.fontSize.md,
-                  padding: theme.spacing.xl,
+                  padding: theme.spacing.lg,
                   minHeight: 120,
                   textAlignVertical: 'top',
                 }}
@@ -202,15 +215,14 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 numberOfLines={6}
               />
             </View>
-
             {/* Submit Button */}
             <TouchableOpacity
               style={{
                 backgroundColor: theme.colors.primary,
-                borderWidth: theme.borderWidth.thick,
+                borderWidth: theme.borderWidth.normal,
                 borderColor: theme.colors.border,
-                paddingVertical: theme.spacing.xl,
-                paddingHorizontal: theme.spacing.xxxl,
+                paddingVertical: theme.spacing.lg,
+                paddingHorizontal: theme.spacing.xl,
                 alignItems: 'center',
               }}
               onPress={handleSubmit}
@@ -231,10 +243,10 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             {/* Results Section */}
             <View style={{
               backgroundColor: theme.colors.surface,
-              borderWidth: theme.borderWidth.thick,
+              borderWidth: theme.borderWidth.normal,
               borderColor: theme.colors.border,
-              padding: theme.spacing.xxxl,
-              marginBottom: theme.spacing.xxxl,
+              padding: theme.spacing.xl,
+              marginBottom: theme.spacing.xl,
             }}>
               <Text style={{
                 color: theme.colors.text,
@@ -246,9 +258,8 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               }}>
                 ANALYSIS RESULTS:
               </Text>
-              
               {/* User Definition */}
-              <View style={{ marginBottom: theme.spacing.xl }}>
+              <View style={{ marginBottom: theme.spacing.lg }}>
                 <Text style={{
                   color: theme.colors.textMuted,
                   fontFamily: fonts.monoBold,
@@ -275,9 +286,8 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   </Text>
                 </View>
               </View>
-
               {/* Score */}
-              <View style={{ marginBottom: theme.spacing.xl }}>
+              <View style={{ marginBottom: theme.spacing.lg }}>
                 <Text style={{
                   color: theme.colors.textMuted,
                   fontFamily: fonts.monoBold,
@@ -304,9 +314,36 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                   />
                 </View>
               </View>
-
+              {/* AI Correct Definition */}
+              <View style={{ marginBottom: theme.spacing.lg }}>
+                <Text style={{
+                  color: theme.colors.textMuted,
+                  fontFamily: fonts.monoBold,
+                  fontSize: theme.fontSize.md,
+                  textTransform: 'uppercase',
+                  letterSpacing: theme.letterSpacing.tight,
+                  marginBottom: theme.spacing.sm,
+                }}>
+                  AI CORRECT DEFINITION:
+                </Text>
+                <View style={{
+                  backgroundColor: theme.colors.background,
+                  borderWidth: theme.borderWidth.normal,
+                  borderColor: theme.colors.borderMuted,
+                  padding: theme.spacing.lg,
+                }}>
+                  <Text style={{
+                    color: theme.colors.text,
+                    fontFamily: fonts.mono,
+                    fontSize: theme.fontSize.md,
+                    lineHeight: 20,
+                  }}>
+                    {aiDefinition || 'No definition available.'}
+                  </Text>
+                </View>
+              </View>
               {/* Feedback */}
-              <View style={{ marginBottom: theme.spacing.xl }}>
+              <View style={{ marginBottom: theme.spacing.lg }}>
                 <Text style={{
                   color: theme.colors.textMuted,
                   fontFamily: fonts.monoBold,
@@ -334,15 +371,14 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 </View>
               </View>
             </View>
-
             {/* Next Button */}
             <TouchableOpacity
               style={{
                 backgroundColor: theme.colors.primary,
-                borderWidth: theme.borderWidth.thick,
+                borderWidth: theme.borderWidth.normal,
                 borderColor: theme.colors.border,
-                paddingVertical: theme.spacing.xl,
-                paddingHorizontal: theme.spacing.xxxl,
+                paddingVertical: theme.spacing.lg,
+                paddingHorizontal: theme.spacing.xl,
                 alignItems: 'center',
               }}
               onPress={handleNext}

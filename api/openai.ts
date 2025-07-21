@@ -13,7 +13,7 @@ export const scoreDefinition = async (
   userDefinition: string,
   word: string,
   realDefinition: string
-): Promise<ScoringResponse> => {
+): Promise<{ score: number; explanation: string; ai_definition?: string }> => {
   try {
     // Check if API key is available
     if (!OPENAI_API_KEY) {
@@ -39,7 +39,8 @@ RESPONSE FORMAT:
 Respond ONLY with a valid JSON object in this exact format:
 {
   "score": [number between 0-100],
-  "explanation": "[brief explanation of the score, 1-2 sentences]"
+  "explanation": "[brief explanation of the score, 1-2 sentences]",
+  "ai_definition": "[your own best concise definition of the word]"
 }
 
 Be fair but strict in your assessment. Consider accuracy, completeness, and clarity.`;
@@ -48,7 +49,7 @@ Be fair but strict in your assessment. Consider accuracy, completeness, and clar
 REAL DEFINITION: "${realDefinition}"
 USER DEFINITION: "${userDefinition}"
 
-Please score the user's definition against the real definition.`;
+Please score the user's definition against the real definition and provide your own best concise definition of the word.`;
 
     const response = await fetch(OPENAI_API_URL, {
       method: 'POST',
@@ -63,7 +64,7 @@ Please score the user's definition against the real definition.`;
           { role: 'user', content: userMessage }
         ],
         temperature: 0.3, // Lower temperature for more consistent scoring
-        max_tokens: 200, // Limit response length
+        max_tokens: 250, // Allow a bit more room for the definition
       }),
     });
 
@@ -86,20 +87,21 @@ Please score the user's definition against the real definition.`;
 
     // Try to parse the JSON response
     try {
-      const parsedResponse: ScoringResponse = JSON.parse(content);
-      
+      const parsedResponse = JSON.parse(content);
       // Validate the response
       if (typeof parsedResponse.score !== 'number' || 
           parsedResponse.score < 0 || 
           parsedResponse.score > 100) {
         throw new Error('Invalid score value');
       }
-      
       if (typeof parsedResponse.explanation !== 'string' || 
           parsedResponse.explanation.trim().length === 0) {
         throw new Error('Invalid explanation');
       }
-
+      // ai_definition is optional but should be a string if present
+      if (parsedResponse.ai_definition && typeof parsedResponse.ai_definition !== 'string') {
+        throw new Error('Invalid ai_definition');
+      }
       return parsedResponse;
     } catch (parseError) {
       console.error('Failed to parse OpenAI response:', content, parseError);

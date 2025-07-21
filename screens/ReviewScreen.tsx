@@ -39,7 +39,7 @@ const ReviewScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <StatusBar barStyle="light-content" backgroundColor={theme.colors.surface} />
+      <StatusBar barStyle="light-content" />
       
       {/* Navigation Bar */}
       <View style={{
@@ -114,13 +114,18 @@ const ReviewScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         </View>
       </View>
 
-      <ScrollView style={{ flex: 1, paddingHorizontal: theme.spacing.xxxl }}>
+      <ScrollView 
+        style={{ flex: 1, paddingHorizontal: theme.spacing.lg }}
+        showsVerticalScrollIndicator={true}
+        contentContainerStyle={{ paddingBottom: 50 }}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Header Section */}
         <View style={{
-          paddingVertical: theme.spacing.xxxxl,
-          borderBottomWidth: theme.borderWidth.thick,
+          paddingVertical: theme.spacing.xxxl,
+          borderBottomWidth: theme.borderWidth.normal,
           borderBottomColor: theme.colors.borderMuted,
-          marginBottom: theme.spacing.xxxl,
+          marginBottom: theme.spacing.xl,
         }}>
           <Text style={{
             color: theme.colors.textMuted,
@@ -150,10 +155,10 @@ const ReviewScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             {/* Input Section */}
             <View style={{
               backgroundColor: theme.colors.surface,
-              borderWidth: theme.borderWidth.thick,
+              borderWidth: theme.borderWidth.normal,
               borderColor: theme.colors.border,
-              padding: theme.spacing.xxxl,
-              marginBottom: theme.spacing.xxxl,
+              padding: theme.spacing.xl,
+              marginBottom: theme.spacing.xl,
             }}>
               <Text style={{
                 color: theme.colors.text,
@@ -169,12 +174,12 @@ const ReviewScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               <TextInput
                 style={{
                   backgroundColor: theme.colors.background,
-                  borderWidth: theme.borderWidth.thick,
+                  borderWidth: theme.borderWidth.normal,
                   borderColor: theme.colors.border,
                   color: theme.colors.text,
                   fontFamily: fonts.mono,
                   fontSize: theme.fontSize.md,
-                  padding: theme.spacing.xl,
+                  padding: theme.spacing.lg,
                   minHeight: 120,
                   textAlignVertical: 'top',
                 }}
@@ -191,10 +196,10 @@ const ReviewScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             <TouchableOpacity
               style={{
                 backgroundColor: theme.colors.primary,
-                borderWidth: theme.borderWidth.thick,
+                borderWidth: theme.borderWidth.normal,
                 borderColor: theme.colors.border,
-                paddingVertical: theme.spacing.xl,
-                paddingHorizontal: theme.spacing.xxxl,
+                paddingVertical: theme.spacing.lg,
+                paddingHorizontal: theme.spacing.xl,
                 alignItems: 'center',
               }}
               onPress={handleSubmit}
@@ -215,10 +220,10 @@ const ReviewScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             {/* Results Section */}
             <View style={{
               backgroundColor: theme.colors.surface,
-              borderWidth: theme.borderWidth.thick,
+              borderWidth: theme.borderWidth.normal,
               borderColor: theme.colors.border,
-              padding: theme.spacing.xxxl,
-              marginBottom: theme.spacing.xxxl,
+              padding: theme.spacing.xl,
+              marginBottom: theme.spacing.xl,
             }}>
               <Text style={{
                 color: theme.colors.text,
@@ -232,7 +237,7 @@ const ReviewScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               </Text>
               
               {/* User Recall */}
-              <View style={{ marginBottom: theme.spacing.xl }}>
+              <View style={{ marginBottom: theme.spacing.lg }}>
                 <Text style={{
                   color: theme.colors.textMuted,
                   fontFamily: fonts.monoBold,
@@ -261,7 +266,7 @@ const ReviewScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               </View>
 
               {/* Actual Definition */}
-              <View style={{ marginBottom: theme.spacing.xl }}>
+              <View style={{ marginBottom: theme.spacing.lg }}>
                 <Text style={{
                   color: theme.colors.textMuted,
                   fontFamily: fonts.monoBold,
@@ -294,10 +299,10 @@ const ReviewScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             <TouchableOpacity
               style={{
                 backgroundColor: theme.colors.primary,
-                borderWidth: theme.borderWidth.thick,
+                borderWidth: theme.borderWidth.normal,
                 borderColor: theme.colors.border,
-                paddingVertical: theme.spacing.xl,
-                paddingHorizontal: theme.spacing.xxxl,
+                paddingVertical: theme.spacing.lg,
+                paddingHorizontal: theme.spacing.xl,
                 alignItems: 'center',
               }}
               onPress={handleNext}

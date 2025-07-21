@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../styles/theme';
 import { fonts } from '../styles/fonts';
+import { scoreDefinition } from '../api/openai';
 
 const { width } = Dimensions.get('window');
 
@@ -21,17 +22,30 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [feedback, setFeedback] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!userDefinition.trim()) {
       Alert.alert('Error', 'Please enter your definition');
       return;
     }
     
-    // TODO: Send to OpenAI for scoring
     setIsSubmitted(true);
-    setScore(85); // Mock score for now
-    setFeedback('Good understanding! You captured the essence of unexpected discovery.');
+    setIsLoading(true);
+    
+    try {
+      const realDefinition = getRealDefinition(currentWord);
+      
+      const result = await scoreDefinition(userDefinition, currentWord, realDefinition);
+      setScore(result.score);
+      setFeedback(result.explanation);
+    } catch (error) {
+      console.error('Scoring error:', error);
+      setScore(0);
+      setFeedback('Error scoring your definition. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleNext = () => {
@@ -40,11 +54,24 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     setIsSubmitted(false);
     setScore(null);
     setFeedback('');
+    setIsLoading(false);
+  };
+
+  // Real definitions for the words
+  const getRealDefinition = (word: string): string => {
+    const definitions: { [key: string]: string } = {
+      'serendipity': 'The occurrence and development of events by chance in a happy or beneficial way',
+      'ephemeral': 'Lasting for a very short time; transitory',
+      'ubiquitous': 'Present, appearing, or found everywhere',
+      'enigmatic': 'Difficult to interpret or understand; mysterious',
+      'resilient': 'Able to withstand or recover quickly from difficult conditions',
+    };
+    return definitions[word] || 'Definition not available';
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-      <StatusBar barStyle="light-content" backgroundColor={theme.colors.surface} />
+      <StatusBar barStyle="light-content" />
       
       {/* Navigation Bar */}
       <View style={{

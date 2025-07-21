@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,15 +12,33 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { theme } from '../styles/theme';
 import { fonts } from '../styles/fonts';
+import { getPrioritizedWordList, WordEntry } from '../utils/wordlist';
+import { loadUserProgress } from '../utils/storage';
 
 const { width } = Dimensions.get('window');
 
 const ReviewScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-  const [currentWord, setCurrentWord] = useState('serendipity');
+  const [reviewList, setReviewList] = useState<WordEntry[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentWord, setCurrentWord] = useState('');
   const [userRecall, setUserRecall] = useState('');
   const [isRevealed, setIsRevealed] = useState(false);
-  const [realDefinition] = useState('The occurrence and development of events by chance in a happy or beneficial way.');
-  const [streak, setStreak] = useState(5);
+  const [realDefinition, setRealDefinition] = useState('');
+  const [streak, setStreak] = useState(0);
+
+  useEffect(() => {
+    (async () => {
+      const allWords = getPrioritizedWordList();
+      const progress = await loadUserProgress();
+      // Only include words with attempts > 0
+      const reviewed = allWords.filter(w => progress[w.word] && progress[w.word].attempts > 0);
+      setReviewList(reviewed);
+      setCurrentIndex(0);
+      setCurrentWord(reviewed[0]?.word || '');
+      setRealDefinition(reviewed[0]?.word || '');
+      setStreak(0);
+    })();
+  }, []);
 
   const handleSubmit = () => {
     if (!userRecall.trim()) {
@@ -31,10 +49,17 @@ const ReviewScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   };
 
   const handleNext = () => {
-    setCurrentWord('ephemeral');
-    setUserRecall('');
-    setIsRevealed(false);
-    setStreak(prev => prev + 1);
+    const nextIndex = currentIndex + 1;
+    if (nextIndex < reviewList.length) {
+      setCurrentIndex(nextIndex);
+      setCurrentWord(reviewList[nextIndex].word);
+      setRealDefinition(reviewList[nextIndex].word);
+      setUserRecall('');
+      setIsRevealed(false);
+      setStreak(prev => prev + 1);
+    } else {
+      Alert.alert('End of review', 'You have reviewed all words!');
+    }
   };
 
   return (

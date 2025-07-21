@@ -14,6 +14,7 @@ import { theme } from '../styles/theme';
 import { fonts } from '../styles/fonts';
 import { scoreDefinition } from '../api/openai';
 import { getPrioritizedWordList, WordEntry } from '../utils/wordlist';
+import { updateWordProgress, loadUserProgress } from '../utils/storage';
 
 const { width } = Dimensions.get('window');
 
@@ -31,10 +32,13 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   // Load and clean word list on mount
   useEffect(() => {
     (async () => {
-      const list = await getPrioritizedWordList();
-      setWordList(list);
+      const list = getPrioritizedWordList();
+      const progress = await loadUserProgress();
+      // Only include words with no progress or attempts === 0
+      const newWords = list.filter(w => !progress[w.word] || !progress[w.word].attempts);
+      setWordList(newWords);
       setCurrentIndex(0);
-      setCurrentWord(list[0]?.word || '');
+      setCurrentWord(newWords[0]?.word || '');
     })();
   }, []);
 
@@ -51,6 +55,14 @@ const NewWordScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       setScore(result.score);
       setFeedback(result.explanation);
       setAiDefinition(result.ai_definition);
+      // Save progress
+      await updateWordProgress(currentWord, {
+        attempts: (wordList.find(w => w.word === currentWord)?.count || 0) + 1,
+        lastScore: result.score,
+        lastDefinition: userDefinition,
+        lastFeedback: result.explanation,
+        lastAIDefinition: result.ai_definition,
+      });
     } catch (error) {
       console.error('Scoring error:', error);
       setScore(0);
